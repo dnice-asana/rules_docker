@@ -40,7 +40,9 @@ load(
     _canonicalize_path = "canonicalize",
     _join_path = "join",
 )
-load("//container:providers.bzl", "LayerInfo")
+load("//container:providers.bzl", _LayerInfo = "LayerInfo")
+
+LayerInfo = _LayerInfo
 
 def _magic_path(ctx, f, output_layer):
     # Right now the logic this uses is a bit crazy/buggy, so to support

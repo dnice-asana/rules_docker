@@ -15,17 +15,21 @@
 
 load("//container:bundle.bzl", "container_bundle")
 load("//container:flatten.bzl", "container_flatten")
-load("//container:image.bzl", "container_image", "image")
+load("//container:image.bzl", _container_image = "container_image", "image")
 load("//container:layer.bzl", "container_layer")
 load("//container:import.bzl", "container_import")
 load("//container:load.bzl", "container_load")
-load("//container:pull.bzl", "container_pull")
-load("//container:push.bzl", "container_push")
+load("//container:pull.bzl", _container_pull = "container_pull")
+load("//container:push.bzl", _container_push = "container_push")
 load(
     "@bazel_tools//tools/build_defs/repo:http.bzl",
     "http_archive",
     "http_file",
 )
+
+container_image = _container_image
+container_pull = _container_pull
+container_push = _container_push
 
 container = struct(
     image = image,
@@ -198,7 +202,7 @@ py_library(
             urls = ["https://storage.googleapis.com/container-structure-test/v1.4.0/container-structure-test-darwin-amd64"],
         )
 
-    # For skylark_library.
+    # For bzl_library.
     if "bazel_skylib" not in excludes:
         http_archive(
             name = "bazel_skylib",
