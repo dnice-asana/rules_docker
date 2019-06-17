@@ -57,7 +57,7 @@ def _impl(ctx):
     layer_arg = " ".join(["--layer=%s" % _get_runfile_path(ctx, f) for f in blobs])
     config_arg = "--config=%s" % _get_runfile_path(ctx, image["config"])
 
-    ctx.template_action(
+    ctx.actions.expand_template(
         template = ctx.file._tag_tpl,
         substitutions = {
             "%{tag}": "{registry}/{repository}:{tag}".format(
@@ -88,7 +88,7 @@ def _impl(ctx):
             "%{container_pusher}": _get_runfile_path(ctx, ctx.executable._pusher),
         },
         output = ctx.outputs.executable,
-        executable = True,
+        is_executable = True,
     )
 
     runfiles = ctx.runfiles(
@@ -97,7 +97,7 @@ def _impl(ctx):
                     image["config"],
                 ] + image.get("blobsum", []) + image.get("zipped_layer", []) +
                 stamp_inputs + ([image["legacy"]] if image.get("legacy") else []) +
-                list(ctx.attr._pusher.default_runfiles.files),
+                ctx.attr._pusher.default_runfiles.files.to_list(),
     )
 
     return struct(
@@ -116,8 +116,7 @@ def _impl(ctx):
 container_push = rule(
     attrs = dict({
         "image": attr.label(
-            allow_files = [".tar"],
-            single_file = True,
+            allow_single_file = [".tar"],
             mandatory = True,
         ),
         "registry": attr.string(mandatory = True),
@@ -132,8 +131,7 @@ container_push = rule(
         ),
         "_tag_tpl": attr.label(
             default = Label("//container:push-tag.sh.tpl"),
-            single_file = True,
-            allow_files = True,
+            allow_single_file = True,
         ),
         "_pusher": attr.label(
             default = Label("@containerregistry//:pusher"),

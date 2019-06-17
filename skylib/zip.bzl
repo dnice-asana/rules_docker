@@ -15,11 +15,12 @@
 
 def gzip(ctx, artifact):
     """Create an action to compute the gzipped artifact."""
-    out = ctx.new_file(artifact.basename + ".gz")
-    ctx.action(
+    out = ctx.actions.declare_file(artifact.basename + ".gz")
+    ctx.actions.run_shell(
         command = "%s -n < %s > %s" % (ctx.executable.gzip.path, artifact.path, out.path),
-        inputs = [artifact, ctx.executable.gzip],
+        inputs = [artifact],
         outputs = [out],
+        tools = [ctx.executable.gzip],
         use_default_shell_env = True,
         mnemonic = "GZIP",
     )
@@ -27,11 +28,12 @@ def gzip(ctx, artifact):
 
 def gunzip(ctx, artifact):
     """Create an action to compute the gunzipped artifact."""
-    out = ctx.new_file(artifact.basename + ".nogz")
-    ctx.action(
+    out = ctx.actions.declare_file(artifact.basename + ".nogz")
+    ctx.actions.run_shell(
         command = "%s -d < %s > %s" % (ctx.executable.gzip.path, artifact.path, out.path),
-        inputs = [artifact, ctx.executable.gzip],
+        inputs = [artifact],
         outputs = [out],
+        tools = [ctx.executable.gzip],
         use_default_shell_env = True,
         mnemonic = "GUNZIP",
     )

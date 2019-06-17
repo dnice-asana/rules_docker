@@ -60,8 +60,8 @@ def _impl(ctx):
 
         runfiles += [image["config"]] + blobsums + blobs
 
-        out = ctx.new_file("%s.%d.push" % (ctx.label.name, index))
-        ctx.template_action(
+        out = ctx.actions.declare_file("%s.%d.push" % (ctx.label.name, index))
+        ctx.actions.expand_template(
             template = ctx.file._tag_tpl,
             substitutions = {
                 "%{stamp}": stamp_arg,
@@ -76,13 +76,13 @@ def _impl(ctx):
                 "%{container_pusher}": _get_runfile_path(ctx, ctx.executable._pusher),
             },
             output = out,
-            executable = True,
+            is_executable = True,
         )
 
         scripts += [out]
         runfiles += [out]
 
-    ctx.template_action(
+    ctx.actions.expand_template(
         template = ctx.file._all_tpl,
         substitutions = {
             "%{push_statements}": "\n".join([
@@ -91,12 +91,12 @@ def _impl(ctx):
             ]),
         },
         output = ctx.outputs.executable,
-        executable = True,
+        is_executable = True,
     )
 
     return struct(runfiles = ctx.runfiles(files = [
         ctx.executable._pusher,
-    ] + stamp_inputs + runfiles + list(ctx.attr._pusher.default_runfiles.files)))
+    ] + stamp_inputs + runfiles + ctx.attr._pusher.default_runfiles.files.to_list()))
 
 container_push = rule(
     attrs = {
@@ -110,13 +110,11 @@ container_push = rule(
         ),
         "_all_tpl": attr.label(
             default = Label("//contrib:push-all.sh.tpl"),
-            single_file = True,
-            allow_files = True,
+            allow_single_file = True,
         ),
         "_tag_tpl": attr.label(
             default = Label("//container:push-tag.sh.tpl"),
-            single_file = True,
-            allow_files = True,
+            allow_single_file = True,
         ),
         "_pusher": attr.label(
             default = Label("@containerregistry//:pusher"),

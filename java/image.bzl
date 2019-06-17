@@ -104,9 +104,9 @@ def java_files(f):
     files = []
     if java_common.provider in f:
         java_provider = f[java_common.provider]
-        files += list(java_provider.transitive_runtime_jars)
+        files += java_provider.transitive_runtime_jars.to_list()
     if hasattr(f, "files"):  # a jar file
-        files += list(f.files)
+        files += f.files.to_list()
     return files
 
 def _jar_dep_layer_impl(ctx):
@@ -153,17 +153,17 @@ def _jar_app_layer_impl(ctx):
         unavailable += java_files(jar)
 
     unavailable += java_files(ctx.attr.binary)
-    unavailable = [x for x in unavailable if x not in available]
+    unavailable = [x for x in unavailable.to_list() if x not in available.to_list()]
 
     classpath = ":".join([
         layer_file_path(ctx, x)
-        for x in available + unavailable
+        for x in (available | unavailable).to_list()
     ])
 
     # Classpaths can grow long and there is a limit on the length of a
     # command line, so mitigate this by always writing the classpath out
     # to a file instead.
-    classpath_file = ctx.new_file(ctx.attr.name + ".classpath")
+    classpath_file = ctx.actions.declare_file(ctx.attr.name + ".classpath")
     ctx.actions.write(classpath_file, classpath)
 
     binary_path = layer_file_path(ctx, ctx.files.binary[0])

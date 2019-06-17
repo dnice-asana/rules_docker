@@ -103,28 +103,23 @@ compare_ids_fail_test = rule(
         "id": attr.string(mandatory = False, default = ""),
         "reg_exps": attr.string_list(mandatory = False, default = []),
         "_executable_template": attr.label(
-            allow_files = True,
-            single_file = True,
+            allow_single_file = True,
             default = "compare_ids_fail_test.sh.tpl",
         ),
         "_compare_ids_test_bzl": attr.label(
-            allow_files = True,
-            single_file = True,
+            allow_single_file = True,
             default = "//contrib:compare_ids_test.bzl",
         ),
         "_compare_ids_test": attr.label(
-            allow_files = True,
-            single_file = True,
+            allow_single_file = True,
             default = "//contrib:compare_ids_test.py",
         ),
         "_extract_image_id": attr.label(
-            allow_files = True,
-            single_file = True,
+            allow_single_file = True,
             default = "//contrib:extract_image_id.py",
         ),
         "_BUILD": attr.label(
-            allow_files = True,
-            single_file = True,
+            allow_single_file = True,
             default = "//contrib:BUILD",
         ),
     },

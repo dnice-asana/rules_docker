@@ -71,9 +71,8 @@ _container_test = rule(
     attrs = {
         "image_tar": attr.label(
             executable = True,
-            allow_files = True,
             mandatory = True,
-            single_file = True,
+            allow_single_file = True,
             cfg = "target",
         ),
         "image_name": attr.string(
@@ -104,8 +103,7 @@ _container_test = rule(
         ),
         "_structure_test_tpl": attr.label(
             default = Label("//contrib:structure-test.sh.tpl"),
-            allow_files = True,
-            single_file = True,
+            allow_single_file = True,
         ),
     },
     executable = True,
