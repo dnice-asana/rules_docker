@@ -82,6 +82,7 @@ container_import(
 
     result = repository_ctx.execute(args, **kwargs)
     if result.return_code:
+        print(args)
         fail("Pull command failed: %s (%s)" % (result.stderr, " ".join(args)))
 
 container_pull = repository_rule(
